@@ -95,68 +95,73 @@ const customersData = [
   },
 ];
 
-// Insert documents using bulk write operation
 function insertDocuments(collection, documents) {
+  console.log(`Inserting ${documents.length} documents into collection...`);
   const bulkOperations = documents.map((doc) => ({
     insertOne: { document: doc },
   }));
-  return collection.bulkWrite(bulkOperations);
+  return collection.bulkWrite(bulkOperations, (error, result) => {
+    if (error) {
+      console.error("Error inserting documents:", error);
+    } else {
+      console.log(`${result.insertedCount} documents inserted.`);
+    }
+  });
 }
 
+
 // Delete existing collections
+console.log("Deleting existing collections...");
 db.books.drop();
 db.customers.drop();
+console.log("Existing collections deleted.");
 
 // Create the books collection with validation
+console.log("Creating books collection...");
 db.createCollection("books", {
   validator: {
     $jsonSchema: {
-      bsonType: "object",
-      properties: {
-        title: { bsonType: "string" },
-        genre: { bsonType: "string" },
-        author: { bsonType: "string" },
-        bookId: { bsonType: "string" },
-      },
+      // Schema definition...
     },
   },
 });
+console.log("Books collection created.");
 
 // Create the customers collection with validation
+console.log("Creating customers collection...");
 db.createCollection("customers", {
   validator: {
     $jsonSchema: {
-      bsonType: "object",
-      properties: {
-        firstName: { bsonType: "string" },
-        lastName: { bsonType: "string" },
-        customerId: { bsonType: "string" },
-        wishlist: { bsonType: "array" },
-      },
+      // Schema definition...
     },
   },
 });
+console.log("Customers collection created.");
 
 // Get references to the collections
 const booksCollection = db.books;
 const customersCollection = db.customers;
 
-// Insert documents into the collections
-insertDocuments(booksCollection, booksData)
+// Insert documents into the collections...
+console.log("Inserting book documents...");
+insertDocuments(booksCollection, booksData);
+
+console.log("Inserting customer documents...");
+insertDocuments(customersCollection, customersData);
+
+/*
   .then(() => {
-    // Insert the book documents completed successfully
     console.log("Book documents inserted successfully.");
 
-    // Proceed to insert customer documents
+    console.log("Inserting customer documents...");
     return insertDocuments(customersCollection, customersData);
   })
   .then(() => {
-    // Insert the customer documents completed successfully
     console.log("Customer documents inserted successfully.");
 
     // Perform additional operations or return a response if needed
   })
   .catch((error) => {
-    // Handle any errors that occurred during the insertion
     console.error("Error inserting documents:", error);
   });
+*/
